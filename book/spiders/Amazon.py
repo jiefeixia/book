@@ -56,7 +56,7 @@ class AmazonSpider(scrapy.Spider):
         item['image'] = response.xpath('//div[@id="main-image-container"]//img/@src').extract()[0]
         item['price'] = response.xpath('//span[@class="a-size-medium a-color-price inlineBlock-display offer-price a-text-normal price3P"]/text()').extract()[0]
 
-        item['web'] = 'JD'
+        item['web'] = 'Amazon'
 
         self.items.append(item)
         return self.items
