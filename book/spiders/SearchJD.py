@@ -13,20 +13,22 @@ class SearchjdSpider(scrapy.Spider):
     allowed_domains = ["jd.com"]
     start_urls = ['https://book.jd.com']
 
-    def __init__(self):
+
+    def __init__(self, ISBN=None):
+        self.ISBN = ISBN
         dcap = dict(DesiredCapabilities.PHANTOMJS)
         dcap["phantomjs.page.settings.userAgent"] = ("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.221 Safari/537.36 SE 2.X MetaSr 1.0")
         dcap["phantomjs.page.settings.loadImages"] = False
         self.driver = webdriver.PhantomJS(desired_capabilities=dcap)
 
-        
-    def parse(self, response, ISBN):
+
+    def parse(self, response):
         self.driver.set_page_load_timeout(20)
         self.driver.get(response.url)
 
         element = self.driver.find_element_by_id("key")
         element.clear()
-        element.send_keys(ISBN)
+        element.send_keys(self.ISBN)
         element.send_keys(Keys.ENTER)
 
         time.sleep(1)
