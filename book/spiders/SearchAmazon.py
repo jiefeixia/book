@@ -3,14 +3,15 @@ import scrapy
 from selenium import webdriver
 from book.items import BookItem
 import re
+from book.models import *
+from django.db import models
 
 class SearchamazonSpider(scrapy.Spider):
     name = "SearchAmazon"
     allowed_domains = ["amazon.cn"]
     start_urls = ['http://www.amazon.cn/']
 
-    def __init__(self, ISBN=None):
-        self.ISBN = ISBN
+    def __init__(self):
         dcap = dict(DesiredCapabilities.PHANTOMJS)
         dcap["phantomjs.page.settings.userAgent"] = ("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.221 Safari/537.36 SE 2.X MetaSr 1.0")
         dcap["phantomjs.page.settings.loadImages"] = False
@@ -21,9 +22,13 @@ class SearchamazonSpider(scrapy.Spider):
         self.driver.set_page_load_timeout(20)
         self.driver.get(response.url)
 
+        for book in Book.objects.all():
+            if not BookSpec.objects.filter( book=book, web="Amazon" ).exist():
+                ISBN=book.ISBN
+
         element = self.driver.find_element_by_id("twotabsearchtextbox")
         element.clear()
-        element.send_keys(self.ISBN)
+        element.send_keys(ISBN)
         element.send_keys(Keys.ENTER)
 
         time.sleep(1)
